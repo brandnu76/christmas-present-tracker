@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Christmas Present Tracker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f8ff;
+            color: #333;
+            text-align: center;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .input-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        .input-group label {
+            display: block;
+            font-weight: bold;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .button {
+            background-color: #28a745;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .button:disabled {
+            background-color: #ccc;
+        }
+        .recipient-list {
+            margin-top: 20px;
+            text-align: left;
+        }
+        .recipient-item {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Christmas Present Tracker 🎄</h2>
+        <div class="input-group">
+            <label for="totalLimit">Total Spending Limit ($):</label>
+            <input type="number" id="totalLimit" placeholder="Enter your total spending limit">
+        </div>
+        <div class="input-group">
+            <label for="recipientLimit">Spending Limit Per Recipient ($):</label>
+            <input type="number" id="recipientLimit" placeholder="Enter spending limit per recipient">
+        </div>
+        <button class="button" onclick="addRecipient()">Add Recipient</button>
+        <button class="button" onclick="clearAll()">Clear All</button>
+        <div class="recipient-list" id="recipients"></div>
+    </div>
+
+    <script>
+        let totalLimit = 0;
+        let recipientLimit = 0;
+        let totalSpent = 0;
+        let recipients = [];
+
+        function updateLimits() {
+            totalLimit = parseFloat(document.getElementById('totalLimit').value) || 0;
+            recipientLimit = parseFloat(document.getElementById('recipientLimit').value) || 0;
+        }
+
+        function addRecipient() {
+            updateLimits();
+            const recipientName = prompt("Enter the recipient's name:");
+            if (!recipientName) return;
+            
+            const giftDescription = prompt("Enter the first gift's description:");
+            if (!giftDescription) return;
+
+            const giftAmount = parseFloat(prompt("Enter the amount spent on this gift:")) || 0;
+            if (giftAmount > recipientLimit) {
+                alert("Gift amount exceeds recipient's limit.");
+                return;
+            }
+
+            const newRecipient = {
+                name: recipientName,
+                gifts: [{ description: giftDescription, amount: giftAmount }]
+            };
+            recipients.push(newRecipient);
+            totalSpent += giftAmount;
+            renderRecipients();
+            alert(`Recipient "${recipientName}" added with first gift "${giftDescription}".`);
+        }
+
+        function renderRecipients() {
+            const recipientsContainer = document.getElementById('recipients');
+            recipientsContainer.innerHTML = '';
+            recipients.forEach((recipient, index) => {
+                const recipientDiv = document.createElement('div');
+                recipientDiv.className = 'recipient-item';
+                
+                let giftsHtml = recipient.gifts.map((gift, giftIndex) => `
+                    <p>Gift ${giftIndex + 1}: ${gift.description} - $${gift.amount}</p>
+                `).join('');
+
+                recipientDiv.innerHTML = `
+                    <strong>${recipient.name}</strong>
+                    ${giftsHtml}
+                    <p><strong>Total Spent on ${recipient.name}:</strong> $${recipient.gifts.reduce((acc, gift) => acc + gift.amount, 0)} / $${recipientLimit}</p>
+                `;
+                recipientsContainer.appendChild(recipientDiv);
+            });
+        }
+
+        function clearAll() {
+            totalLimit = 0;
+            recipientLimit = 0;
+            totalSpent = 0;
+            recipients = [];
+            document.getElementById('totalLimit').value = '';
+            document.getElementById('recipientLimit').value = '';
+            document.getElementById('recipients').innerHTML = '';
+            alert('All data cleared.');
+        }
+    </script>
+
+</body>
+</html>
